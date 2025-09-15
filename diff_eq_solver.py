@@ -3,11 +3,12 @@ import numpy as np
 import math
 
 def diff_eq_function(x: float, y: float) -> float:
-    return math.sin(y)
+    return math.sin(x**y)
 
 diff_eq_function_np = np.vectorize(diff_eq_function)
 
 def direction_field(range: list[float, float], n: int | None = None) -> list[list]:
+    
     """Generates the meshgrids (matrices) used to create a direction field of 
     a given first-order differential equation using plt.quiver.
     
@@ -18,7 +19,7 @@ def direction_field(range: list[float, float], n: int | None = None) -> list[lis
     if n == None:
         n = 20
     x = np.linspace(range[0], range[1], n)
-    y = np.linspace(range[0], range[4], n)
+    y = np.linspace(range[0], range[1], n)
 
     X, Y = np.meshgrid(x, y) 
     
@@ -28,11 +29,24 @@ def direction_field(range: list[float, float], n: int | None = None) -> list[lis
     U = U/np.sqrt(U**2 + V**2)
     V = V/np.sqrt(U**2 + V**2)
 
-    return list(X, Y, U, V)
+    return [X, Y, U, V]
 
-def euler(initial_cond: list[float], step: float, final_x: float) -> float:
+def euler(initial_cond: list[float], final_x: float, n: float | None = None) -> float:
+    
+    """Use Euler's method to approximate and return a numerical solution to a first-order 
+    differential equation for a given x-value and given an initial value.
+    
+    initial_cond: list containing initial value [x, y]
+    step: step size 
+    final_x: the x-value to approximate"""
+    
+    if n == None:
+        n = 40
+
     x = initial_cond[0]
     y = initial_cond[1]
+
+    step = (final_x - x)/n
 
     while x < final_x:
         y = y + step * diff_eq_function(x, y)
@@ -40,11 +54,39 @@ def euler(initial_cond: list[float], step: float, final_x: float) -> float:
      
     return y
     
-
-
-plt.subplots
-
-
+def diff_eq_solver(initial_cond: list[float], range: list[float, float]) -> None:
     
-plt.quiver()
-plt.show()
+    """Create matplotlib plots that shows a numerical solution to first-order differential equation
+    for a given range, alongside a direction field.
+    
+    range: list containing lower and upper bound for both x and y axis"""
+
+    x_values = np.linspace(range[0], range[1], 30)
+
+    y_values = []
+
+    for i in x_values:
+        y_values.append(euler(initial_cond, i))
+    
+    y_values = np.array(y_values)
+
+    plt.plot(x_values, y_values)
+    ylim_fixer = (range[1]-range[0])*0.05
+
+    # Previously the ylim was determined by the graph of the solution to the 
+    # differential equation, meaning it could blow up the upper bound of the
+    # y-axis.
+
+    # This next line of code resets the bounds of the y-axis so that its upper bound
+    # is slightly larger than the upper bound of range and slightly lower than the 
+    # lower bound of range (so that the direction field arrows are not cut off)
+
+    plt.ylim(range[0]-ylim_fixer, range[1]+ylim_fixer) 
+
+    dir_field = direction_field([0, 4])
+    plt.quiver(dir_field[0], dir_field[1], dir_field[2], dir_field[3])
+    plt.show()
+
+diff_eq_solver([0, 2], [0, 4])
+
+
