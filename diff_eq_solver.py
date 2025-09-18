@@ -152,12 +152,13 @@ def diff_eq_solver(initial_cond: list[float],
     rangex: range of the x-axis
     rangey: range of the y-axis"""
 
-    x_values = np.linspace(rangex[0], rangex[1], 100)
+    x_values = np.linspace(rangex[0], rangex[1], 1000)
 
     y_values_euler = []
     y_values_improved_euler = []
     y_values_rk4 = []
 
+    print("Calculating values...")
     for i in x_values:
         y_values_euler.append(euler(initial_cond, i))
         y_values_improved_euler.append(improved_euler(initial_cond, i))
@@ -167,6 +168,7 @@ def diff_eq_solver(initial_cond: list[float],
     y_values_improved_euler = np.array(y_values_improved_euler)
     y_values_rk4 = np.array(y_values_rk4)
 
+    print("Plotting...")
     plt.plot(x_values, y_values_euler, label = 'euler')
     plt.plot(x_values, y_values_improved_euler, label = 'heun')
     plt.plot(x_values, y_values_rk4, label = 'rk4')
@@ -180,6 +182,7 @@ def diff_eq_solver(initial_cond: list[float],
     dir_field = direction_field(rangex, rangey)
     plt.quiver(dir_field[0], dir_field[1], dir_field[2], dir_field[3])
     plt.legend()
+    print("Done.")
     plt.show()
 
-diff_eq_solver([0, 2], [-5, 5], [-5, 5])
+diff_eq_solver([0, 2], [-5, 5], [-5, 5]) #TODO: change initial value and axes ranges to your choice
