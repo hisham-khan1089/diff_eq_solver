@@ -32,10 +32,10 @@ on real differential equations to see if and how they diverge.
 ## Using the Script
 The script is present in diff_eq_solver.py.
 - Edit differential equation
-  diff_eq_function is the function that represents the f(x,y) in dy/dx = f(x,y).
-  Edit the output of this function to edit your differential equation.
+   - diff_eq_function is the function that represents the f(x,y) in dy/dx = f(x,y).
+   - Edit the output of this function to edit your differential equation.
 - Creating the plot
-  diff_eq_solver is the function that does all the work to solve and plot the solution.
-  The first argument is the initial condition (a point that satisfies the equation).
-  The second two arguments are the x and y ranges. Once you run the script, a matplotlib
-  plot will appear showing the solutions using various numerical methods.
+  - diff_eq_solver is the function that does all the work to solve and plot the solution.
+  - The first argument is the initial condition (a point that satisfies the equation).
+  - The second two arguments are the x and y ranges. Once you run the script, a matplotlib plot will appear showing the solutions using various numerical methods.
+   
