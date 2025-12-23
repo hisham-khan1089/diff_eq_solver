@@ -1,11 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 
 def diff_eq_function(x: float, y: float) -> float:
-    return 1/(1+x**2-y**2) #TODO: change this function to your desired function
-
-diff_eq_function_np = np.vectorize(diff_eq_function)
+    return np.cos(x*y) #TODO: change this function to your desired function
 
 def direction_field(rangex: list[float, float], 
                     rangey: list[float, float], 
@@ -26,7 +23,7 @@ def direction_field(rangex: list[float, float],
     X, Y = np.meshgrid(x, y) 
     
     U = 1
-    V = diff_eq_function_np(X, Y)
+    V = diff_eq_function(X, Y)
 
     U = U/np.sqrt(U**2 + V**2)
     V = V/np.sqrt(U**2 + V**2)
@@ -120,9 +117,9 @@ def runge_kutta_4(initial_cond: list[float],
     if x < final_x:
         while x < final_x:
             k1 = diff_eq_function(x, y)
-            k2 = diff_eq_function(x+step/2, y+step/2*k1)
-            k3 = diff_eq_function(x+step/2, y+step/2*k2)
-            k4 = diff_eq_function(x+step, y+step*k3)
+            k2 = diff_eq_function(x+step/2, y+k1*step/2)
+            k3 = diff_eq_function(x+step/2, y+k2*step/2)
+            k4 = diff_eq_function(x+step, y+k3*step)
 
             y = y + step * (k1 + 2*k2 + 2*k3 + k4)/6
             x = x + step
@@ -130,9 +127,9 @@ def runge_kutta_4(initial_cond: list[float],
     elif x > final_x:
         while x > final_x:
             k1 = diff_eq_function(x, y)
-            k2 = diff_eq_function(x+step/2, y+step/2*k1)
-            k3 = diff_eq_function(x+step/2, y+step/2*k2)
-            k4 = diff_eq_function(x+step, y+step*k3)
+            k2 = diff_eq_function(x+step/2, y+k1*step/2)
+            k3 = diff_eq_function(x+step/2, y+k2*step/2)
+            k4 = diff_eq_function(x+step, y+k3*step)
 
             y = y - step * (k1 + 2*k2 + 2*k3 + k4)/6
             x = x - step
@@ -141,7 +138,7 @@ def runge_kutta_4(initial_cond: list[float],
     
     return y
 
-def diff_eq_solver(initial_cond: list[float], 
+def solve(initial_cond: list[float], 
                    rangex: list[float, float], 
                    rangey: list[float, float]) -> None:
     
@@ -154,35 +151,28 @@ def diff_eq_solver(initial_cond: list[float],
 
     x_values = np.linspace(rangex[0], rangex[1], 1000)
 
-    y_values_euler = []
-    y_values_improved_euler = []
-    y_values_rk4 = []
-
     print("Calculating values...")
-    for i in x_values:
-        y_values_euler.append(euler(initial_cond, i))
-        y_values_improved_euler.append(improved_euler(initial_cond, i))
-        y_values_rk4.append(runge_kutta_4(initial_cond, i))
-
-    y_values_euler = np.array(y_values_euler)
-    y_values_improved_euler = np.array(y_values_improved_euler)
-    y_values_rk4 = np.array(y_values_rk4)
+    y_values_euler = [euler(initial_cond, i) for i in x_values]
+    y_values_improved_euler = [improved_euler(initial_cond, i) for i in x_values]
+    y_values_rk4 = [runge_kutta_4(initial_cond, i) for i in x_values]
 
     print("Plotting...")
     plt.plot(x_values, y_values_euler, label = 'euler')
     plt.plot(x_values, y_values_improved_euler, label = 'heun')
     plt.plot(x_values, y_values_rk4, label = 'rk4')
 
-    # Prevents y axes from blowing up due to function
-    # Also does so without cutting off direction field arrows (hence ylim_fixer)
-
+    # The following prevents the y-axis from blowing up due to function
+    # ylim_fixer prevents cutting off direction field arrows
     ylim_fixer = (rangey[1]-rangey[0])*0.05
     plt.ylim(rangey[0]-ylim_fixer, rangey[1]+ylim_fixer)
 
+    plt.xlabel("x-axis")
+    plt.ylabel("y-axis")
+    
     dir_field = direction_field(rangex, rangey)
     plt.quiver(dir_field[0], dir_field[1], dir_field[2], dir_field[3])
     plt.legend()
     print("Done.")
     plt.show()
 
-diff_eq_solver([0, 2], [-5, 5], [-5, 5]) #TODO: change initial value and axes ranges to your choice
+solve([0, 2], [-4, 4], [-4, 4]) #TODO: change initial value and axes ranges to your choice
